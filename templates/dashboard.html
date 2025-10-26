@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Welcome, {{ current_user.email }}</h2>
+<p>Phone: {{ current_user.phone }}</p>
+<p>Go to the upload page to analyze an eye image.</p>
+<a href="{{ url_for('upload') }}" class="btn btn-success">Upload Eye Image</a>
+{% endblock %}

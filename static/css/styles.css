@@ -1,0 +1,61 @@
+/* ===== Global Background ===== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: transparent; /* background handled by .page-bg */
+  color: #fff; /* default text white for readability */
+}
+
+/* Background image (eye) */
+.page-bg {
+  background: url("../images/eye_bg.jpg") no-repeat center center fixed;
+  background-size: cover;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -2;
+}
+
+/* Dark overlay to improve text readability */
+.page-overlay {
+  background: rgba(0, 0, 0, 0.55);
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+}
+
+/* ===== Navbar ===== */
+.navbar-brand {
+  font-weight: 700;
+  color: #0d6efd !important;
+}
+.navbar .nav-link {
+  color: #fff !important;
+}
+.navbar {
+  background: rgba(0, 0, 0, 0.7) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ===== Headings ===== */
+h1.display-4 {
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+/* ===== Cards ===== */
+.card {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #000; /* text inside card stays dark for readability */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* ===== Footer ===== */
+footer {
+  color: #ddd;
+}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center vh-100 text-center">
+  <div>
+    <h1 class="display-1 fw-bold text-uppercase" style="color:#0d91fd; letter-spacing:2px;">
+      EYELUME
+    </h1>
+    <p class="lead text-light mb-4">
+      Non-invasive demo for pupil segmentation and early eye-strain indicators.
+    </p>
+    <div>
+      <a href="{{ url_for('signup') }}" class="btn btn-primary btn-lg me-2">Get Started</a>
+      <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">Login</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

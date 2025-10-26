@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Demo: How to take/upload a good eye image</h3>
+<ul>
+  <li>Use a close-up image of a single eye (left or right). Avoid both eyes together.</li>
+  <li>Good lighting, minimal glare/reflection on the cornea.</li>
+  <li>Avoid heavy makeup or obstructions.</li>
+  <li>Image should be sharp — not blurry.</li>
+</ul>
+<p class="text-center"><img src="{{ demo_image }}" class="img-fluid rounded shadow" style="max-width:320px;"></p>
+{% endblock %}

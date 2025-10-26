@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="card-title text-center mb-3">Forgot Password</h4>
+        <p class="text-muted text-center">
+          Enter your registered phone number. We will send you an OTP to reset your password.
+        </p>
+
+        <!-- Phone input form -->
+        <div id="otp-section">
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="phone" 
+              placeholder="Enter your phone number (10 digits)" 
+              required>
+          </div>
+          <!-- reCAPTCHA placeholder -->
+          <div id="recaptcha-container" class="mb-3"></div>
+          <button id="sendOtp" class="btn btn-primary w-100">Send OTP</button>
+        </div>
+
+        <!-- OTP verification section (hidden initially) -->
+        <div id="verify-section" style="display:none;">
+          <div class="mb-3">
+            <label for="otp" class="form-label">Enter OTP</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="otp" 
+              placeholder="Enter the 6-digit OTP" 
+              required>
+          </div>
+          <button id="verifyOtp" class="btn btn-success w-100">Verify OTP</button>
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="{{ url_for('login') }}">Back to Login</a>
+        </div>
+
+        <!-- Message alert -->
+        <div id="message" class="text-center mt-3 fw-bold"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase Scripts -->
+<script type="module">
+  // Import Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDpS0k1ZEqHI3TrwNjDIoXVtsbKQaSYItY",
+    authDomain: "eyelume.firebaseapp.com",
+    projectId: "eyelume",
+    storageBucket: "eyelume.firebasestorage.app",
+    messagingSenderId: "3722189197",
+    appId: "1:3722189197:web:387eda213d158f5cb105c4"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Render reCAPTCHA (must be attached after auth init)
+  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    size: 'normal',
+    callback: () => {
+      console.log("reCAPTCHA solved");
+    },
+    'expired-callback': () => {
+      alert("reCAPTCHA expired, please try again");
+    }
+  });
+
+  // Handle Send OTP
+  document.getElementById('sendOtp').addEventListener('click', () => {
+    const phoneInput = document.getElementById('phone').value.trim();
+
+    if (!/^[0-9]{10}$/.test(phoneInput)) {
+      alert("Please enter a valid 10-digit phone number.");
+      return;
+    }
+
+    const phoneNumber = "+91" + phoneInput; // Prefix country code
+    const appVerifier = window.recaptchaVerifier;
+
+    signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+
+        document.getElementById("otp-section").style.display = "none";
+        document.getElementById("verify-section").style.display = "block";
+
+        const msgBox = document.getElementById("message");
+        msgBox.innerText = "OTP sent successfully to " + phoneNumber;
+        msgBox.classList.add("text-success");
+        msgBox.classList.remove("text-danger");
+      })
+      .catch((error) => {
+        const msgBox = document.getElementById("message");
+        msgBox.innerText = "Error sending OTP: " + error.message;
+        msgBox.classList.add("text-danger");
+        msgBox.classList.remove("text-success");
+      });
+  });
+
+  // Handle Verify OTP
+  document.getElementById('verifyOtp').addEventListener('click', () => {
+    const otp = document.getElementById('otp').value.trim();
+
+    if (!/^[0-9]{6}$/.test(otp)) {
+      alert("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
+    window.confirmationResult.confirm(otp)
+      .then((result) => {
+        const msgBox = document.getElementById("message");
+        msgBox.innerText = "OTP verified successfully!";
+        msgBox.classList.add("text-success");
+        msgBox.classList.remove("text-danger");
+
+        // Redirect to reset password page
+        setTimeout(() => {
+          window.location.href = "{{ url_for('reset_password') }}";
+        }, 1000);
+      })
+      .catch((error) => {
+        const msgBox = document.getElementById("message");
+        msgBox.innerText = "Invalid OTP. Please try again.";
+        msgBox.classList.add("text-danger");
+        msgBox.classList.remove("text-success");
+      });
+  });
+</script>
+{% endblock %}

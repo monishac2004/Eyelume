@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="text-center mb-3">Verify Phone (OTP)</h4>
+        <p class="text-muted text-center">
+          Enter your registered phone number to receive an OTP.
+        </p>
+
+        <!-- Phone input -->
+        <div class="mb-3">
+          <label for="phone" class="form-label">Phone Number</label>
+          <input type="text" id="phone" class="form-control" placeholder="+91XXXXXXXXXX" required>
+        </div>
+
+        <!-- reCAPTCHA -->
+        <div id="recaptcha-container" class="mb-3"></div>
+
+        <button id="sendOtpBtn" class="btn btn-primary w-100 mb-3">Send OTP</button>
+
+        <!-- OTP input -->
+        <div id="otpSection" style="display:none;">
+          <div class="mb-3">
+            <label for="otp" class="form-label">Enter OTP</label>
+            <input type="text" id="otp" class="form-control" placeholder="6-digit OTP" required>
+          </div>
+          <button id="verifyOtpBtn" class="btn btn-success w-100">Verify OTP</button>
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="{{ url_for('login') }}">Back to Login</a>
+        </div>
+
+        <div id="message" class="text-center mt-3 text-success fw-bold"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase JS -->
+<script type="module">
+  // Import Firebase SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+  // ✅ Your actual Firebase config from your project
+  const firebaseConfig = {
+    apiKey: "AIzaSyCuYs4rkr8iU7NSutqrtmG2V0DULVIAUw",
+    authDomain: "eyelume-aede7.firebaseapp.com",
+    projectId: "eyelume-aede7",
+    storageBucket: "eyelume-aede7.appspot.com",
+    messagingSenderId: "1089655726715",
+    appId: "1:1089655726715:web:683c247e6f3e2629bb78de"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  auth.languageCode = "en";
+
+  // ✅ Setup reCAPTCHA verifier
+  window.recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    "recaptcha-container",
+    {
+      size: "normal", // use "invisible" if you prefer
+      callback: (response) => {
+        console.log("reCAPTCHA verified successfully.");
+      },
+      "expired-callback": () => {
+        alert("reCAPTCHA expired, please verify again.");
+      },
+    }
+  );
+
+  let confirmationResult;
+
+  // ✅ Send OTP
+  document.getElementById("sendOtpBtn").addEventListener("click", async () => {
+    const phone = document.getElementById("phone").value.trim();
+    if (!phone.startsWith("+")) {
+      alert("Enter phone number with country code (e.g. +91XXXXXXXXXX)");
+      return;
+    }
+
+    try {
+      const appVerifier = window.recaptchaVerifier;
+      confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
+      document.getElementById("otpSection").style.display = "block";
+      document.getElementById("message").innerText = "OTP sent successfully! Please check your phone.";
+      console.log("OTP sent to:", phone);
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Error sending OTP: " + error.message);
+    }
+  });
+
+  // ✅ Verify OTP
+  document.getElementById("verifyOtpBtn").addEventListener("click", async () => {
+    const otp = document.getElementById("otp").value.trim();
+    if (!otp) {
+      alert("Please enter the OTP you received.");
+      return;
+    }
+
+    try {
+      await confirmationResult.confirm(otp);
+      document.getElementById("message").innerText = "Phone verified successfully!";
+      alert("OTP verified successfully!");
+      // Redirect to reset password page
+      window.location.href = "{{ url_for('reset_password') }}";
+    } catch (error) {
+      console.error("Invalid OTP:", error);
+      alert("Invalid OTP: " + error.message);
+    }
+  });
+</script>
+{% endblock %}

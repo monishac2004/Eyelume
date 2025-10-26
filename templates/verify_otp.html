@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h3>Verify OTP</h3>
+    <p>Enter the 6-digit OTP sent to your phone (demo prints it to server terminal).</p>
+    <form method="POST" action="{{ url_for('verify_otp') }}">
+      <div class="mb-3">
+        <label class="form-label">OTP</label>
+        <input class="form-control" name="otp" type="text" maxlength="6" required>
+      </div>
+      <button class="btn btn-primary">Verify</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
